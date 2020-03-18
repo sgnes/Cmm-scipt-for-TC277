@@ -1,0 +1,515 @@
+GLOBAL &CPU &filename1 &filename2 &filename3 &progflash
+
+Dialog
+(
+	HEADER "flash program untility"
+
+	POS  0. 0. 55. 3.
+	BOX "Select the Device"
+	POS  1. 1. 12. 1.
+	target.tc277tp:	CHOOSEBOX "TC277TP" "" 
+	POS  14. 1. 12. 1.
+	target.tc277te:	CHOOSEBOX "TC277TE" ""
+	POS  28. 1. 12. 1.
+	target.tc277tf:	CHOOSEBOX "TC277TF" ""
+	
+	
+	POS  0. 3. 55. 3.
+	BOX "Select Connect type"
+	POS 1. 4. 12. 1.
+	type.jtag: 			CHOOSEBOX "JTAG" ""
+	POS 14. 4. 12. 1.
+	type.dap: 			CHOOSEBOX "DAP" ""
+	
+	POS  0. 6. 55. 3.
+	BOX "Select JTAG clock"
+	POS  1. 7. 12. 1.
+	clock.high: 			CHOOSEBOX "10MHz" ""
+	POS  14. 7. 12. 1.
+	clock.low: 			CHOOSEBOX "900KHz" ""
+	
+	POS 0. 9. 55. 7.
+	BOX "Select program file"
+	POS 1. 10. 6. 1.
+	code.hex:				CHECKBOX "HEX" "gosub btnelftohex"
+	POS 9. 10. 36. 1.
+	codehex:EDIT "" ""
+	POS 45. 10. 9. 1.
+	btn.hex:				BUTTON "Select HEX file..."
+	(
+		LOCAL &file_path
+		DIALOG.File *.hex 
+		ENTRY &filename1
+		if "&filename1"!=""
+		(
+		dialog.set codehex "&filename1"
+		)
+	)
+	
+	
+	POS 1. 12. 6. 1.
+	code.FBL_ELF:				CHECKBOX "FBL_ELF" "gosub btnhextoelf"
+	POS 9. 12. 36. 1.
+	codefbl:EDIT "" ""
+	POS 45. 12. 9. 1.
+	btn.FBL_ELF:				BUTTON "Select FBL_ELF file..."
+	(
+		LOCAL &file_path
+		DIALOG.File *.elf 
+		ENTRY &filename2
+		if "&filename2"!=""
+		(
+		dialog.set codefbl "&filename2"
+		)
+	)
+	
+	POS 1. 14. 6. 1.
+	code.APP_ELF:				CHECKBOX "APP_ELF" "gosub btnappelf"
+	POS 9. 14. 36. 1.
+	codeapp:EDIT "" ""
+	POS 45. 14. 9. 1.
+	btn.APP_ELF:				BUTTON "Select APP_ELF file..."
+	(
+		LOCAL &file_path
+		DIALOG.File *.elf 
+		ENTRY &filename3
+		if "&filename3"!=""
+		(
+		dialog.set codeapp "&filename3"
+		)
+	)
+	
+	POS 1. 16. 9. 1.
+	btn.help:				BUTTON "[:helpw]Help"
+	(
+      DIALOG
+      (
+        HEADER "About TRACE32 TriCore Flash untility"
+
+        POS  0. 0. 65. 19.
+        BOX "Untility Set"
+        POS  1. 1. 63. 1.
+        TEXT "This is a flash program untility for Infineon TriCore Devices."
+        TEXT ""
+        TEXT "Untility usage:"
+        TEXT "1) Select the CPU"
+        TEXT "2) Select the connect type"
+        TEXT "3) Select the target file which you want to program to internal flash"
+        TEXT "4) After you selected then push update flash to complete the flash program"
+        TEXT "5) During the process the tools will let you select whether program:"
+        TEXT "		A) YES 	---   program"
+        TEXT "		B) NO   ---   interupt the program and enter flash prepare mode"
+
+        POS  0. 19. 65. 9.
+        BOX "Unrestricted TriCore Debug Tool"
+        POS  1. 20. 63. 1.
+        TEXT "For more information visit:"
+        TEXT "Tricore flash untility Verison 1.0"
+        TEXT "Author:	Able TEL:18013510047"
+        TEXT "    http://www.lauterbach.com/bdmtc.html"
+        TEXT "    http://www.lauterbach.com/pro_infineon.html#TriCore"
+
+        POS 26. 28.5 13. 1.
+        DEFBUTTON "OK" "continue"
+      )
+
+      STOP
+      DIALOG.END
+      SCREEN
+  )
+    POS 25. 16. 9. 1.
+    	btn.connect:				BUTTON "Connect CPU"
+    	(
+		Reset
+		if dialog.boolean(target.tc277tp)
+		(
+			&CPU="TC277TP"
+			SYStem.CPU TC277TP
+			SYStem.config debugporttype JTAG
+			if dialog.boolean(type.dap)
+			(
+				SYStem.config debugporttype DAP2
+				SYStem.CONFIG.DAP.DAPENABLE ON
+			)
+			SYStem.jtagclock 900KHz
+			if dialog.boolean(clock.high)
+			(
+				SYStem.jtagclock 10MHz
+			)
+			SYStem.Up
+		)
+		
+		if dialog.boolean(target.tc277te)
+		(
+			&CPU="TC75TE"
+			SYStem.CPU TC277TE
+			SYStem.config debugporttype JTAG
+			if dialog.boolean(type.dap)
+			(
+				SYStem.config debugporttype DAP2
+				SYStem.CONFIG.DAP.DAPENABLE ON
+			)
+			SYStem.jtagclock 900KHz
+			if dialog.boolean(clock.high)
+			(
+				SYStem.jtagclock 10MHz
+			)
+			SYStem.Up
+
+		)
+		if dialog.boolean(target.tc277tf)
+		(
+			&CPU="TC75TF"
+			SYStem.CPU TC277TF
+			SYStem.config debugporttype JTAG
+			if dialog.boolean(type.dap)
+			(
+				SYStem.config debugporttype DAP2
+				SYStem.CONFIG.DAP.DAPENABLE ON
+			)
+			SYStem.jtagclock 900KHz
+			if dialog.boolean(clock.high)
+			(
+				SYStem.jtagclock 10MHz
+			)
+			SYStem.Up
+
+		)
+	 DO loadpath.cmm
+         DO loadsymbol.cmm
+	 
+      Dialog.END
+     
+	)
+
+
+
+
+    POS 35. 16. 9. 1.
+	btn.erase:				BUTTON "Erase flash"
+	(
+		Reset
+		if dialog.boolean(target.tc277tp)
+		(
+			&CPU="TC277TP"
+			SYStem.CPU TC277TP
+			SYStem.config debugporttype JTAG
+			if dialog.boolean(type.dap)
+			(
+				SYStem.config debugporttype DAP2
+				SYStem.CONFIG.DAP.DAPENABLE ON
+			)
+			SYStem.jtagclock 900KHz
+			if dialog.boolean(clock.high)
+			(
+				SYStem.jtagclock 10MHz
+			)
+			DO TCReset.cmm	
+			DO tc27x CPU=TC277TP DUALPORT=1 PREPAREONLY 
+			DIALOG.YESNO "Do you want Erase flash memory?"
+  			LOCAL &progflash
+  			ENTRY &progflash
+			IF &progflash
+			(
+				flash.erase all
+			)
+		)
+		
+		if dialog.boolean(target.tc277te)
+		(
+			&CPU="TC75TE"
+			SYStem.CPU TC277TE
+			SYStem.config debugporttype JTAG
+			if dialog.boolean(type.dap)
+			(
+				SYStem.config debugporttype DAP2
+				SYStem.CONFIG.DAP.DAPENABLE ON
+			)
+			SYStem.jtagclock 900KHz
+			if dialog.boolean(clock.high)
+			(
+				SYStem.jtagclock 10MHz
+			)
+			DO TCReset.cmm	
+			DO tc27x CPU=TC277TE PREPAREONLY
+			DIALOG.YESNO "Do you want Erase flash memory?"
+  			LOCAL &progflash
+  			ENTRY &progflash
+  			IF &progflash
+  			(
+				flash.erase all
+			)
+		)
+		if dialog.boolean(target.tc277tf)
+		(
+			&CPU="TC75TF"
+			SYStem.CPU TC277TF
+			SYStem.config debugporttype JTAG
+			if dialog.boolean(type.dap)
+			(
+				SYStem.config debugporttype DAP2
+				SYStem.CONFIG.DAP.DAPENABLE ON
+			)
+			SYStem.jtagclock 900KHz
+			if dialog.boolean(clock.high)
+			(
+				SYStem.jtagclock 10MHz
+			)
+			DO TCReset.cmm	
+			DO tc27x CPU=TC277TF PREPAREONLY
+			DIALOG.YESNO "Do you want Erase flash memory?"
+  			LOCAL &progflash
+  			ENTRY &progflash
+  			IF &progflash
+  			(
+				flash.erase all
+			)
+		)		
+	)
+	
+	POS 45. 16. 9. 1.
+	btn.update:				BUTTON "update flash"
+	(	
+		Reset
+		wait 100.ms
+		
+		gosub SetPath
+
+		&filename1=dialog.string(codehex)	
+		&filename2=dialog.string(codefbl)
+		&filename3=dialog.string(codeapp)
+		
+		if dialog.boolean(target.tc277tp)
+		(
+			&CPU="TC277TP"
+			SYStem.CPU TC277TP
+			SYStem.config debugporttype JTAG
+			if dialog.boolean(type.dap)
+			(
+				SYStem.config debugporttype DAP2
+				SYStem.CONFIG.DAP.DAPENABLE ON
+			)
+			SYStem.jtagclock 900KHz
+			if dialog.boolean(clock.high)
+			(
+				SYStem.jtagclock 10MHz
+			)
+			DO TCReset.cmm	
+			DO tc27x CPU=TC277TP DUALPORT=1 PREPAREONLY 
+			DIALOG.YESNO "Program internal flash memory?"
+  			LOCAL &progflash
+  			ENTRY &progflash
+  			IF &progflash
+  			(
+				FLASH.ReProgram.ALL
+				if dialog.boolean(code.hex)
+					(
+						data.load.auto "&filename1"
+						print "load hex code"
+					)
+					if dialog.boolean(code.FBL_ELF)
+					(
+						data.load.auto "&filename2" /nocode
+						print "load fbl code"
+					)
+					if dialog.boolean(code.APP_ELF)
+					(
+						data.load.auto "&filename3" /nocode
+						print "load app code"
+					)
+				FLASH.ReProgram.off
+				DO tc27x CPU=TC277TP PREPAREONLY CHECKBMHD
+				//data.load.elf "&filename3" /nocode
+				
+
+			)
+		)
+	if dialog.boolean(target.tc277tf)
+		(
+			&CPU="TC277TF"
+			SYStem.CPU TC277TF
+			SYStem.config debugporttype JTAG
+			if dialog.boolean(type.dap)
+			(
+				SYStem.config debugporttype DAP2
+				SYStem.CONFIG.DAP.DAPENABLE ON
+			)
+			SYStem.jtagclock 900KHz
+			if dialog.boolean(clock.high)
+			(
+				SYStem.jtagclock 10MHz
+			)
+			DO TCReset.cmm	
+			DO tc27x CPU=TC277TF DUALPORT=1 PREPAREONLY 
+			DIALOG.YESNO "Program internal flash memory?"
+  			LOCAL &progflash
+  			ENTRY &progflash
+  			IF &progflash
+  			(
+				FLASH.ReProgram.ALL
+				if dialog.boolean(code.hex)
+					(
+						data.load.auto "&filename1"
+						print "load hex code"
+					)
+					if dialog.boolean(code.FBL_ELF)
+					(
+						data.load.auto "&filename2" /nocode
+						print "load fbl code"
+					)
+					if dialog.boolean(code.APP_ELF)
+					(
+						data.load.auto "&filename3" /nocode
+						print "load app code"
+					)
+				FLASH.ReProgram.off
+				DO tc27x CPU=TC277TF PREPAREONLY CHECKBMHD
+
+			)
+		)	
+		if dialog.boolean(target.tc277te)
+		(
+			&CPU="TC75TE"
+			SYStem.CPU TC277TE
+			SYStem.config debugporttype JTAG
+			if dialog.boolean(type.dap)
+			(
+				SYStem.config debugporttype DAP2
+				SYStem.CONFIG.DAP.DAPENABLE ON
+			)
+			SYStem.jtagclock 900KHz
+			if dialog.boolean(clock.high)
+			(
+				SYStem.jtagclock 10MHz
+			)
+			DO TCReset.cmm	
+			DO tc27x CPU=TC277TE PREPAREONLY
+			DIALOG.YESNO "Program internal flash memory?"
+  			LOCAL &progflash
+  			ENTRY &progflash
+  			IF &progflash
+  			(
+					FLASH.ReProgram.ALL
+					if dialog.boolean(code.hex)
+					(
+						data.load.auto "&filename1"
+						print "load hex code"
+					)
+					if dialog.boolean(code.FBL_ELF)
+					(
+						data.load.auto "&filename2" /nocode
+						print "load fbl code"
+					)
+					if dialog.boolean(code.APP_ELF)
+					(
+						data.load.auto "&filename3" /nocode
+						print "load app code"
+					)
+					FLASH.ReProgram.off
+					DO tc27x CPU=TC277TE PREPAREONLY CHECKBMHD
+				)
+		)
+		;gosub SetPath
+	)
+)
+Dialog.set target.tc277tp
+Dialog.set type.jtag
+Dialog.set clock.high
+Dialog.enable btn.hex
+Dialog.enable btn.FBL_ELF
+Dialog.enable btn.APP_ELF
+Dialog.set code.hex
+;Dialog.set code.FBL_ELF
+Dialog.set code.APP_ELF
+Dialog.disable btn.erase
+;&filename1="D:\test.hex"
+;&filename2="D:\test.elf"
+;&filename3="D:\test.bin"
+
+gosub GetPath
+stop
+dialog.end
+enddo
+
+btnelftohex:
+	if dialog.boolean(code.hex)
+	(
+		Dialog.enable btn.hex
+	)
+	else
+	(
+		Dialog.disable btn.hex
+	)
+	return
+		
+btnhextoelf:
+	if dialog.boolean(code.FBL_ELF)
+	(
+		Dialog.enable btn.FBL_ELF
+	)
+	else
+	(
+		Dialog.disable btn.FBL_ELF
+	)
+	return
+	
+btnappelf:
+	if dialog.boolean(code.APP_ELF)
+	(
+		Dialog.enable btn.APP_ELF
+	)
+	else
+	(
+		Dialog.disable btn.APP_ELF
+	)
+	return
+	
+GetPath:
+if OS.file(~~\hexenvpath.txt)
+(
+	open #1 ~~\hexenvpath.txt /read
+	read #1 &filename1 
+	dialog.set codehex "&filename1" 
+	close #1 
+)
+if OS.file(~~\FBL_ELFpath.txt)
+(
+	open #1 ~~\FBL_ELFpath.txt /read
+	read #1 &filename2
+	dialog.set codefbl "&filename2"  
+	close #1
+)
+if OS.file(~~\APP_ELFpath.txt)
+(
+	open #1 ~~\APP_ELFpath.txt /read
+	read #1 &filename3
+	dialog.set codeapp "&filename3"  
+	close #1
+)
+return
+
+SetPath:
+
+if "&filename1"!=""
+(
+open #1 ~~\hexenvpath.txt /create /write
+write #1 "&filename1"
+close #1
+)
+
+if "&filename2"!=""
+(
+open #1 ~~\FBL_ELFpath.txt /create /write
+write #1 "&filename2"
+close #1
+)
+
+if "&filename3"!=""
+(
+open #1 ~~\APP_ELFpath.txt /create /write
+write #1 "&filename3"
+close #1
+)
+
+
+return

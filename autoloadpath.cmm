@@ -1,0 +1,5 @@
+dialog.EXecute BTNRELOAD
+wait 1.ms
+dialog.end
+
+enddo

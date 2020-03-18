@@ -1,0 +1,13 @@
+if CPUFAMILY()=="TRICORE"
+(
+	print "tricore"
+	system.RESetTarget
+	PER.Set D:0xF00000E8 %Long 0x12000000
+	PER.Set D:0xF00001E8 %Long 0x12000000
+	PER.Set D:0xF00002E8 %Long 0x12000000
+)
+else
+(
+	print "default"
+	system.RESetTarget
+)

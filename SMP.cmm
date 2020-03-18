@@ -1,0 +1,16 @@
+SYStem.mode down
+SYStem.detect CPU
+//IF CPUIS("TC27*A")||CPUIS("TC27*E")||CPUIS("TC27*F")||CPUIS("TC277TP")
+(
+	core.assign 1. 2. 3.
+)
+
+Do TCReset.cmm
+TargetSystem
+TrOnchip.SOFTWARE ON
+d.l /core 0.
+d.l /core 1.
+d.l /core 2.
+system.option.DUALPORT ON
+
+Enddo

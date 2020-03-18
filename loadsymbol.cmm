@@ -1,0 +1,14 @@
+LOCAL &Strippath &Spath &Offset &strippart
+	&Strippath=DIALOG.STRING(STRIP)
+	&Spath=DIALOG.STRING(SPATH)
+	&Offset=STRING.SCAN("&Strippath","\",0)
+	&strippart=1
+	while &Offset!=-1					//find how may "\" and strip it
+	(
+	&Offset=STRING.SCAN("&Strippath","\",&Offset+1)
+	&strippart=&strippart+1
+	)
+	;print "&Strippath"
+	;print "&strippart"
+	data.load.elf &filename /strippart &strippart /nocode
+	symbol.SourcePATH.SetBaseDir &Spath

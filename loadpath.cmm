@@ -1,0 +1,148 @@
+GLOBAL &file_path1 &file_path2 &filename
+
+DIALOG.view
+(
+HEADER "Change SOURCEPATH"
+POS 0. 1. 41. 1.
+line "Change ELF PATH"
+POS 1. 2. 40. 1.
+STRIP: EDIT "" ""
+
+POS 42. 2. 12. 1.
+BUTTON "[:colorgreen]Selecet ELF..."
+(
+	local &file_path
+	DIALOG.File *.elf 
+	ENTRY &filename
+	if "&filename"!=""
+	(
+	data.load.elf &filename /nocode
+	&file_path=sYmbol.SOURCEFILE(cstart)			//find function main sourcepath
+	dialog.set STRIP "&file_path"	
+	)
+)
+
+POS 0. 3. 41. 1.
+LINE "Selection New SourcePath"
+POS 1. 4. 40. 1.
+SPATH: EDIT "" ""
+POS 42. 4. 12. 1.
+BUTTON "[:coloryellow]SourcePath..."
+(
+DIALOG.SetDIR SPATH C:\T32\*
+)
+POS 1. 6. 8. 1.
+btn.help:				BUTTON "[:helpw]Help"
+	(
+      DIALOG
+      (
+        HEADER "About TRACE32 TriCore Change SourcePath"
+
+        POS  0. 0. 65. 19.
+        BOX "How it work?"
+        POS  1. 1. 63. 1.
+        TEXT "This is a tools for auto change sourcepath"
+        TEXT ""
+        TEXT "Setup"
+        TEXT "1) Touch button Selecet ELF to load a elf file symbol and tools will detect the main code source path"
+        TEXT "2) Select how many default source base path you want to cut in Change ELF PATH window"
+        TEXT "3) Touch button SourcePath to select which folder will be the base path"
+        TEXT "4) Touch RLOAD SYMBOL to change research pat"
+        TEXT "5) If the enviroment is default then just touch RLOAD SYMBOL"
+
+        POS  0. 19. 65. 9.
+        BOX "Unrestricted TriCore Debug Tool"
+        POS  1. 20. 63. 1.
+        TEXT "For more information visit:"
+        TEXT "Tricore flash untility Verison 1.0"
+        TEXT "Author:	Able TEL:18013510047"
+        TEXT "    http://www.lauterbach.com/bdmtc.html"
+        TEXT "    http://www.lauterbach.com/pro_infineon.html#TriCore"
+
+        POS 26. 28.5 13. 1.
+        DEFBUTTON "OK" "continue"
+      )
+
+      STOP
+      DIALOG.END
+      SCREEN
+  )
+
+POS 42. 6. 12. 1.
+BTNRELOAD: DEFBUTTON "RLOAD SYMBOL"
+(
+	LOCAL &Strippath &Spath &Offset &strippart
+	&Strippath=DIALOG.STRING(STRIP)
+	&Spath=DIALOG.STRING(SPATH)
+	&Offset=STRING.SCAN("&Strippath","\",0)
+	&strippart=1
+	while &Offset!=-1					//find how may "\" and strip it
+	(
+	&Offset=STRING.SCAN("&Strippath","\",&Offset+1)
+	&strippart=&strippart+1
+	)
+	;print "&Strippath"
+	;print "&strippart"
+	data.load.elf &filename /strippart &strippart /nocode
+	symbol.SourcePATH.SetBaseDir &Spath
+	gosub SetPath
+)
+
+POS 0. 7. 54. 1.
+LINE ""
+)
+gosub GetPath
+STOP
+dialog.end
+enddo
+
+GetPath:
+if OS.file(~~\elfenvpath.txt)
+(
+	open #1 ~~\elfenvpath.txt /read
+	read #1 &filename
+	close #1
+)
+
+if OS.file(~~\sourceenvpath.txt)
+(
+	open #1 ~~\sourceenvpath.txt /read
+	read #1 &file_path1 
+	dialog.set STRIP "&file_path1"
+	close #1 
+)
+if OS.file(~~\baseenvpath.txt)
+(
+	open #1 ~~\baseenvpath.txt /read
+	read #1 &file_path2
+	dialog.set SPATH "&file_path2"  
+	close #1
+)
+return
+
+SetPath:
+&file_path1=dialog.string(STRIP)
+&file_path2=dialog.string(SPATH)
+
+if "&file_path1"!=""
+(
+open #1 ~~\sourceenvpath.txt /create /write
+write #1 "&file_path1"
+close #1
+)
+
+if "&file_path2"!=""
+(
+open #1 ~~\baseenvpath.txt /create /write
+write #1 "&file_path2"
+close #1
+)
+
+if "&filename"!=""
+(
+open #1 ~~\elfenvpath.txt /create /write
+write #1 "&filename"
+close #1
+)
+return
+enddo

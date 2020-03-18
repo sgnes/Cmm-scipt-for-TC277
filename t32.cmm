@@ -1,0 +1,84 @@
+; TRACE32 Simulator Demos for Infineon TriCore CPUs.
+;
+; This software demonstrates the capabilities of the TRACE32 Debugger.
+; If you have any questions, please feel free to contact Lauterbach
+; via our local subsidiaries or sales partners.
+; You will find us at:
+;
+;         http://www.lauterbach.com/sales.html
+;
+;
+;
+; TRACE32 Simulator Demo for TriCore devices.
+; You do not need to modifiy this script. In case of any questions, please
+; do not hesitate to contact Lauterbach.
+;
+; $Id: t32.cmm 3436 2010-03-15 12:06:10Z mobermeir $
+
+; read in script parameter
+LOCAL &parameter
+ENTRY &parameter
+
+; ======================================================================
+; define globals
+  GLOBAL &targetcpu    ; CPU on targetsystem
+
+; set to defaults, will be overwritten
+  &targetcpu="tc1736"
+
+
+; ======================================================================
+; add some extra buttons to the toolbar
+  MENU.ReProgram
+  (
+    Add
+    toolbar
+    (
+      separator
+      toolitem "Source/List"      ":list"     "Data.List"
+      toolitem "Memory Dump"      ":dump"     "Data.dump"
+      toolitem "Register"         ":reg"      "Register /SpotLight"
+      separator
+      toolitem "Watch"            ":var"      "Var.Watch"
+      toolitem "Stack"            ":varframe" "Var.Frame /l /c"
+      toolitem "Automatic Watch"  ":varref"   "Var.Ref"
+      separator
+      toolitem "List Breakpoints" ":break"    "Break.List"
+      toolitem "List Symbols"     ":symbols"  "sYmbol.Browse"
+      separator
+      toolitem "Flash Program"     "F"         "DO flash.cmm"
+      toolitem "Change SourcePath" "PATH"      "DO loadpath.cmm"
+    )
+    ADD
+    MENU
+    (
+      POPUP "Getting Started"
+      (
+        Menuitem "[:help]General Information"            "EDIT.open readme.txt /NoSave"
+        Menuitem "[:help]Training (How to use TRACE32)"  "help.pdf pdf/demo.pdf"
+        Menuitem "[:help]ICD Tutorial"                   "help.pdf pdf/icd_tutorial.pdf"
+        Menuitem "[:help]TriCore specific help"          "help.pdf pdf/simulator_tricore.pdf"
+      )
+    )
+    ADD
+    MENU
+    (
+    	POPUP "Aurix"
+    	(
+    		POPUP "single/Multicore Debug"
+    		(
+			Menuitem "Single SYStem" "DO Single.cmm"
+    			Menuitem "SMP SYStem" "Do SMP.cmm"
+    		)
+		Menuitem "Reset target without suspend STM" "SYStem.Resettarget"
+    	)
+    )
+  )
+
+; return from scripts
+
+;Auto run script
+do loadpath.cmm
+do autoloadpath.cmm
+
+  ENDDO

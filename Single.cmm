@@ -1,0 +1,10 @@
+SYStem.mode down
+SYStem.detect CPU
+
+Do TCReset.cmm
+core.assign 1.
+
+TrOnchip.SOFTWARE OFF
+d.l 
+
+Enddo
